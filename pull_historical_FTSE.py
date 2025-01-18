@@ -65,24 +65,47 @@ def data_processing(ftse_tickers):
 
 ftse_updated = data_processing(ftse_tickers)
 
-fields_price = ['Open', 'Close', 'Adjusted_Close' 'Last_Price', 'Volume']
-fields_ratio = ['PE_RATIO', 'PB_RATIO', 'DIVIDEND_YIELD', 'ROE', 'ROA', 'DEBT_TO_EQUITY'
+# Fields for price, market data, risk, and volatility
+fields_price = [
+    'PX_LAST',         # Last price
+    'PX_OPEN',         # Open price
+    'PX_HIGH',         # High price
+    'PX_LOW',          # Low price
+    'PX_CLOSE',        # Close price
+    'PX_ADJ_CLOSE',    # Adjusted close price
+    'VOLUME',          # Trading volume
+    'VOLUME_AVG',      # Average volume
+    'OPEN_INT',         # Open interest
+    'VOLATILITY_30D',   # 30-day volatility
+    'BETA'             # Beta coefficient (systematic risk)
 ]
+
+# Fields for financial ratios 
+fields_ratio = [
+    'PE_RATIO',        # Price-to-earnings ratio
+    'PB_RATIO',        # Price-to-book ratio
+    'DIVIDEND_YIELD',  # Dividend yield
+    'ROE',             # Return on equity
+    'ROA',             # Return on assets
+    'DEBT_TO_EQUITY'   # Debt-to-equity ratio
+]
+
+
 Start_date = '2010-01-01'
 End_date = '2023-12-31'
 
 # Fetch historical data
 historical_tick_data = blp.bdh(tickers=ftse_updated, flds=fields_price, start_date=Start_date, end_date=End_date)
-historical_ratio = blp.bdh(tickers = ftse_updated, flds = fields_ratio, start_date = Start_date, end_date = End_date)
+historical_ratio = blp.bdh(tickers=ftse_updated, flds=fields_ratio, start_date=Start_date, end_date=End_date)
 
+# Check the returned dataframes (optional)
+print(historical_tick_data.head())
+print(historical_ratio.head())
 
 # Save data to a CSV file
 file_name_price = f'ticker_data_{Start_date}_{End_date}.csv'
 historical_tick_data.to_csv(file_name_price)
 
-
-
 file_name_ratio = f'financial_ratio_data_{Start_date}_{End_date}.csv'
 historical_ratio.to_csv(file_name_ratio)
-
 
