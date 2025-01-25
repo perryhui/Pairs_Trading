@@ -1,6 +1,6 @@
 import blpapi
-from xbbg import blp
 import pandas as pd
+import sys
 
 ftse_tickers = [
     "ENT", "SMIN", "SPX", "PRU", "AAL", "CRDA", "BEZ", "TW", "GLEN", "AHT", "DPLM", 
@@ -34,18 +34,21 @@ ftse_tickers = [
     "KLR", "VOF", "BUT", "XPS", "BGEO", "FRAS", "MTRO", "TFIF", "JII", "FOUR", "APAX", 
     "UKW", "MEGP", "BBGI", "WOSG", "SEIT", "RPI", "JUST", "FGEN", "EWI", "AO", "ROO", 
     "SEQI", "GCP", "BHMG", "DEC", "PETS", "CHRY", "ESCT", "IPO", "ONT", "JUP", "TRIG", 
-    "BPT", "NAS", "WPS", "HOC", "HRI", "BAKK", "BVIC","AGVI", "AAS", "AAIF", "ADIG", "AEI", "ASLI", "ANII", "API", "AUSC", "AEWU", "AEP", "APN", "APTD", 
-    "AIE", "ASC", "AUGM", "ARR", "AJOT", "AVON", "BGCG", "BGEU", "BGS", "BGUK", "BIOG", "BRAI", "BERI", 
-    "BRFI", "BRLA", "BOOT", "BASC", "CABP", "CPI", "CAPD", "CNE", "CARD", "CRT", "CARR", "CCJI", "CWR", 
-    "CSN", "CLIG", "CBG", "CLI", "COST", "CYN", "NCYF", "CTPE", "CTUK", "CHI", "CREI", "CVCG", "DLAR", 
-    "DFS", "DGI9", "DIVI", "DORE", "DIG", "EGL", "ECOR", "ENQ", "ECEL", "EAT", "EVOK", "FDM", "FAS", 
-    "FJV", "FORT", "FOXT", "FSTA", "FCH", "GFRD", "GABI", "GOT", "GSF", "GMS", "GYM", "HFD", "HEAD", 
-    "HLCL", "HFEL", "HHI", "HINT", "HOT", "HSW", "IGC", "IBT", "IPF", "IAT", "BIPS", "IGET", "IPU", "FSJ", 
-    "JAGI", "JCGI", "JCH", "JEGI", "JARA", "JEMI", "JUGI", "JUSC", "KMR", "KPC", "LABS", "LTI", "LIO", 
-    "LWI", "LSL", "LUCE", "MGCI", "MACF", "MAJE", "MNL", "MARS", "MNP", "MCB", "MER", "MWY", "MCT", "GLE", "MMIT", 
-    "MTE", "MTU", "MOTR", "NRR", "NAVF", "NXR", "NAIT", "OCN", "ORIT", "OIT", 
-    "OTB", "OIG", "OXB", "PAC", "PCA", "PINT", "PBEE", "PDL", "PFC", "PHAR", 
-    "PSDL", "PCTN", "PINE", "PCGH", "PRV", "PRTC", "PZC", "RNK", "RCH", "RECI", 
+    "BPT", "NAS", "WPS", "HOC", "HRI", "BAKK", "BVIC","AGVI", "AAS", "AAIF", "ADIG", 
+    "AEI", "ASLI", "ANII", "API", "AUSC", "AEWU", "AEP", "APN", "APTD", "AIE", "ASC",
+    "AUGM", "ARR", "AJOT", "AVON", "BGCG", "BGEU", "BGS", "BGUK", "BIOG", "BRAI", "BERI", 
+    "BRFI", "BRLA", "BOOT", "BASC", "CABP", "CPI", "CAPD", "CNE", "CARD", "CRT", "CARR", 
+    "CCJI", "CWR", "CSN", "CLIG", "CBG", "CLI", "COST", "CYN", "NCYF", "CTPE", "CTUK", 
+    "CHI", "CREI", "CVCG", "DLAR", "DFS", "DGI9", "DIVI", "DORE", "DIG", "EGL", "ECOR",
+    "ENQ", "ECEL", "EAT", "EVOK", "FDM", "FAS", "FJV", "FORT", "FOXT", "FSTA", "FCH", 
+    "GFRD", "GABI", "GOT", "GSF", "GMS", "GYM", "HFD", "HEAD", "HLCL", "HFEL", "HHI", 
+    "HINT", "HOT", "HSW", "IGC", "IBT", "IPF", "IAT", "BIPS", "IGET", "IPU", "FSJ", 
+    "JAGI", "JCGI", "JCH", "JEGI", "JARA", "JEMI", "JUGI", "JUSC", "KMR", "KPC",
+    "LABS", "LTI", "LIO", "LWI", "LSL", "LUCE", "MGCI", "MACF", "MAJE", "MNL", 
+    "MARS", "MNP", "MCB", "MER", "MWY", "MCT", "GLE", "MMIT", "MTE", "MTU", 
+    "MOTR", "NRR", "NAVF", "NXR", "NAIT", "OCN", "ORIT", "OIT", "OTB", "OIG", 
+    "OXB", "PAC", "PCA", "PINT", "PBEE", "PDL", "PFC", "PHAR", "PSDL", "PCTN", 
+    "PINE", "PCGH", "PRV", "PRTC", "PZC", "RNK", "RCH", "RECI", 
     "REC", "RGL", "RESI", "RCDO", "RIII", "RSE", "RMII", "RWA", "SUS", "SBRE", 
     "SAGA", "ATR", "SERE", "SCF", "SJG", "SREI", "SCP", "INOV", "SST", "STB", 
     "SSIT", "SFR", "SHRS", "SHI", "SNWS", "SOHO", "SDY", "SWEF", "SEC", "STS", 
@@ -54,58 +57,143 @@ ftse_tickers = [
     "XPP", "ZTF"
 ]
 
-
+price_fields = ['PX_OPEN', 'PX_CLOSE', 'PX_HIGH', 'PX_ADJ_CLOSE', 'VOL', 'VOL_AVG' ]
+ratio_fields = []
 
 def data_processing(ftse_tickers):
     ftse_updated = []
     for ticker in ftse_tickers:
-        ftse_updated.append(ticker + " LN Equity")  # Add ' LN Equity' to each ticker
+        ftse_updated.append(ticker + 'LN Equity')  # Add ' LN Equity' to each ticker
     return ftse_updated
 
 
 ftse_updated = data_processing(ftse_tickers)
 
-# Fields for price, market data, risk, and volatility
-fields_price = [
-    'PX_LAST',         # Last price
-    'PX_OPEN',         # Open price
-    'PX_HIGH',         # High price
-    'PX_LOW',          # Low price
-    'PX_CLOSE',        # Close price
-    'PX_ADJ_CLOSE',    # Adjusted close price
-    'VOLUME',          # Trading volume
-    'VOLUME_AVG',      # Average volume
-    'OPEN_INT',         # Open interest
-    'VOLATILITY_30D',   # 30-day volatility
-    'BETA'             # Beta coefficient (systematic risk)
-]
 
-# Fields for financial ratios 
-fields_ratio = [
-    'PE_RATIO',        # Price-to-earnings ratio
-    'PB_RATIO',        # Price-to-book ratio
-    'DIVIDEND_YIELD',  # Dividend yield
-    'ROE',             # Return on equity
-    'ROA',             # Return on assets
-    'DEBT_TO_EQUITY'   # Debt-to-equity ratio
-]
+def start_session():
+    try: 
+        options = blpapi.SessionOptions() # Create a session (Connect to Bloomberg's server via API)
+        options.setServerHost('localhost') # Host: Which machine is interacting with Bloomberg's server
+        options.setServerPort(8194) # Port: Which specific commnuication end point are we interacting with, 8914 by default
+        options.bandwidthSaveModeDisabled(True) # Disable bandwidth saving measure
+        options.setAutoRestartOnDisconnection(True) #Restart connection if disconnected
+        session = blpapi.Session(options)
+        session.start()
+        # Error Handling for non sucessful session
+        if not session.start(): 
+            print('Failed to start session. Please check Bloomberg API')
+            sys.exit(1)
+        else:
+            print('Session sucessfully started')
+            return session
+        # Error handling for raised Exception
+    except blpapi.Exception as e:
+        print(f'Bloomberg API exception occurred: {e}')
+        sys.exit(1)
+    
+    except Exception as e:
+        print(f'An unexpected error occurred: {e}')
+        sys.exit(1)
 
 
-Start_date = '2010-01-01'
-End_date = '2023-12-31'
+def open_service(session, service_name = '//blp/refdata'):
+    if not session.openService(service_name):
+        print(f'Failed to open: {service_name}')
+        return None
+    return session.getService(service_name)
 
-# Fetch historical data
-historical_tick_data = blp.bdh(tickers=ftse_updated, flds=fields_price, start_date=Start_date, end_date=End_date)
-historical_ratio = blp.bdh(tickers=ftse_updated, flds=fields_ratio, start_date=Start_date, end_date=End_date)
 
-# Check the returned dataframes (optional)
-print(historical_tick_data.head())
-print(historical_ratio.head())
+def request_historical_data_to_dataframe(session, tickers: list, input_fields: list, start_date: str, end_date: str):
+    """
+    Send a Bloomberg API request to fetch historical data and store it in separate DataFrames for each field.
+    
+    Args:
+        session: A running Bloomberg API session.
+        tickers (list): List of ticker symbols (e.g., ["AAPL US Equity"]).
+        input_fields (list): List of data fields (e.g., ["PX_OPEN", "PX_CLOSE"]).
+        start_date (str): Start date in YYYYMMDD format.
+        end_date (str): End date in YYYYMMDD format.
 
-# Save data to a CSV file
-file_name_price = f'ticker_data_{Start_date}_{End_date}.csv'
-historical_tick_data.to_csv(file_name_price)
+    Returns:
+        dict: A dictionary where keys are field names, and values are DataFrames containing the data.
+    """
+    try:
+        # Ensure session is running
+        if not session:
+            print("Error: No active session. Please start the session first.")
+            return
 
-file_name_ratio = f'financial_ratio_data_{Start_date}_{End_date}.csv'
-historical_ratio.to_csv(file_name_ratio)
+        # Open the historical data service
+        if not session.openService('//blp/refdata'):
+            print("Error: Failed to open service //blp/refdata.")
+            return
 
+        # Access the refdata service
+        service = session.getService('//blp/refdata')
+
+        # Create a historical data request
+        request = service.createRequest('HistoricalDataRequest')
+
+        # Add tickers
+        securities_element = request.getElement('securities')
+        for ticker in tickers:
+            securities_element.appendValue(ticker)
+
+        # Add fields
+        fields_element = request.getElement('fields')
+        for field in input_fields:
+            fields_element.appendValue(field)
+
+        # Set request parameters
+        request.set('startDate', start_date)
+        request.set('endDate', end_date)
+        request.set('periodicitySelection', 'DAILY')  # DAILY, WEEKLY, MONTHLY
+
+        # Send the request
+        session.sendRequest(request)
+
+        print("Request sent. Processing response...")
+
+        # Prepare a dictionary to store DataFrames
+        field_dataframes = {field: pd.DataFrame() for field in input_fields}
+
+        # Process the response
+        while True:
+            event = session.nextEvent()
+
+            # Process partial or full responses
+            if event.eventType() in [blpapi.Event.RESPONSE, blpapi.Event.PARTIAL_RESPONSE]:
+                for msg in event:
+                    security_data = msg.getElement("securityData")
+                    ticker = security_data.getElementAsString("security")
+                    field_data = security_data.getElement("fieldData")
+
+                    for i in range(field_data.numValues()):
+                        date = field_data.getValue(i).getElementAsDatetime("date")
+                        for field in input_fields:
+                            if field in field_data.getValue(i).asElement():
+                                value = field_data.getValue(i).getElementAsFloat(field)
+
+                                # Append to DataFrame
+                                if ticker not in field_dataframes[field]:
+                                    field_dataframes[field][ticker] = {}
+
+                                field_dataframes[field][ticker][date] = value
+
+                if event.eventType() == blpapi.Event.RESPONSE:
+                    # Break after the final response
+                    break
+
+            # Handle session termination
+            elif event.eventType() == blpapi.Event.SESSION_TERMINATED:
+                print("Session terminated.")
+                break
+
+        # Convert dictionaries to proper DataFrames
+        for field in input_fields:
+            field_dataframes[field] = pd.DataFrame(field_dataframes[field])
+
+        return field_dataframes
+
+    except Exception as e:
+        print(f"Error during Bloomberg request: {e}")
